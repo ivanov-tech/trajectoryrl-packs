@@ -51,13 +51,14 @@ The instruction defines what is required. Data may suggest adjacent work — fla
 
 ## On learning
 
-After completing the task, write to `/workspace/learned/` via the sandbox SSH session:
+Before starting, read all files in `/workspace/learned/` and apply prior knowledge. Do not rediscover what is already mapped.
 
-```bash
-ssh -o StrictHostKeyChecking=no -i /tmp/id_ed25519 agent@sandbox \
-  "cat >> /workspace/learned/PATTERNS.md" << 'EOF'
-[DATE] area | observation | tool path that worked
-EOF
-```
+After completing the task, append to the appropriate log:
 
-Record: which endpoints existed and their exact paths, entity names (repo owner/name, channel IDs, task database IDs), and any tool call that failed with the exact error. In the next episode, read this file first and skip rediscovering what is already mapped.
+- `/workspace/learned/PATTERNS.md` — recurring structures, entity names, endpoint paths that worked
+- `/workspace/learned/ERRORS.md` — command failures, wrong assumptions, dead ends
+- `/workspace/learned/LEARNINGS.md` — corrections and insights that change future behavior
+
+Each entry format: `[YYYY-MM-DD] area | priority | observation | action taken`
+
+If a fact from a prior episode changes (a name, a channel ID, a time), mark the old entry superseded and prefer the newer observation. Timestamp everything — later episodes may contradict earlier ones.
