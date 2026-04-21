@@ -4,7 +4,7 @@
 
 Read `/workspace/learned/` before anything else. Prior episodes contain proven tool paths, entity names, and failure patterns for this environment. Apply them — don't rediscover what is already known.
 
-Then in parallel: read `/workspace/INSTRUCTION.md`, run `curl -s http://localhost:8090/health`, run `curl -s http://localhost:8090/openapi.json`. You need the task, the live service list, and the endpoint map simultaneously. Waiting for one before fetching the others wastes time you will need later.
+Then in parallel: read `/workspace/INSTRUCTION.md` and read `/workspace/ENVIRONMENT.md`. You need the task and the service contract simultaneously. ENVIRONMENT.md tells you what endpoints exist and how to call them — do not guess, do not probe blindly.
 
 ## On execution budget
 
