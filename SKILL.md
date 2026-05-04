@@ -1,118 +1,116 @@
-# Engineer's Protocol
+# Triage and Repair
 
-A discipline for landing a coded change in a remote workspace under a 15-call budget. What you ship is the only thing that scores.
-
----
-
-## The shape of a session
-
-You have 15 tool calls. Spend them on action, not narration. A clean session is four to six chained calls: one read pass, one plan, one write+verify, one commit. The rest is buffer for one repair pass.
-
-Long internal monologues do not score. Final commits and tests passing do. Treat each tool call as a budget line item.
+A field manual for fixing software in a remote workspace. The job is not to understand the whole codebase. The job is to identify the smallest part that needs to change, change it, and verify.
 
 ---
 
-## Bookkeeping is part of the deliverable
+## What you are doing
 
-Two persistent files inherit across episodes. They are not optional polish — they are evidence the agent is learning. Episodes that skip them score worse on the cross-episode criteria.
+A defect has been flagged. There is a description of intended behaviour, and there is code that does not produce it. Closing the gap between the two is the entire deliverable. Refactors, comments, and documentation that are not required to close the gap are extra work for which there is no demand.
 
-The first call of every session is one chained read covering both the task inputs and the inherited notes:
+Three roles in sequence: triage, surgery, recovery. Time on each should be roughly balanced. Heavy triage produces a thorough report; that is not the deliverable. Skipping triage produces a guess, sometimes correct.
+
+---
+
+## The wrap
+
+Real work lives on a remote machine reachable through SSH. Every shell action that touches code, tests, files, or persistent state goes inside an ssh invocation:
 
 ```
-ssh sandbox 'cat /workspace/INSTRUCTION.md /workspace/SKILL.md /workspace/ENVIRONMENT.md 2>/dev/null; echo "===BUGS==="; cat /workspace/learned/bugs.md 2>/dev/null; echo "===REPO==="; cat /workspace/learned/repo.md 2>/dev/null'
+ssh user@host 'COMMAND'
 ```
 
-`/workspace/learned/bugs.md` — the catalogue of defect classes you have seen and the pattern that fixed each one. One block per defect, in the format below. Read it before forming an opinion. Cite the matching entry in your plan if a defect class from this file is implicated.
+A bare connection without a trailing argument opens, finds nothing, and exits — no shell session is held across calls. A path operation issued without the wrap runs on the wrong machine; the result is empty content or "no such file" with no error visible until the next read.
 
-```
-## <bug-class-name>
-- where: <file path or scope>
-- failing test (if any): <exact test id, e.g. tests.module::test_name>
-- shape of bug: <one sentence — what invariant was violated>
-- pattern that fixes it: <one sentence — data structure or algorithm choice>
-- traps avoided: <one sentence per>
-```
-
-`/workspace/learned/repo.md` — one-line facts that survive between episodes (test command, branch convention, persistent layout). One fact per line. Deduplicate before writing.
-
-The last call of every session — before commit, before exit — appends a new block to `bugs.md` for any defect class encountered this session, plus any new line for `repo.md`. The append is a single `ssh sandbox 'cat >> /workspace/learned/bugs.md' << EOF ... EOF` chained call. No improvisation on format.
-
-If `bugs.md` already has a block whose pattern matches the current defect, do not duplicate — extend the existing block's "traps avoided" with the new observation, in place.
+If a read returns empty unexpectedly, the most likely cause is a missing wrap. The next call recovers by re-issuing the read inside `ssh ... 'CMD'`. When something has failed the same way once already, the next attempt should change shape — different mechanism, different chaining, different scope. Repeating the same failing pattern produces the same failure.
 
 ---
 
-## The four-call rhythm
+## Triage
 
-1. **Read pass.** One ssh call, every path the ticket implies, batched. Independent reads share the call. Subsequent reads only when their target depends on earlier output. Include `/workspace/learned/bugs.md` and `repo.md` in the same call.
+Three artifacts contain everything required:
 
-2. **Plan.** No tool call. Decide the smallest correct change in your head. Name the bug class. Pick the data structure. Choose the test command. If `bugs.md` contains a matching entry, your plan must apply its fix pattern; do not rediscover.
+- The task description, where the workspace places it
+- The code at fault, somewhere under the workspace
+- The verification command that flags the fault, with the failing target listed
 
-3. **Write+verify.** One write pass that composes the change locally then ships it via `scp` or a single `ssh sandbox 'cat > /path/file'` heredoc, then runs the visible test command in the same chained call. If the diff is small, prefer `sed -i` on the remote.
+Read all three in one chained ssh call. Independent paths share the call; later reads are warranted only when their target is unknowable until earlier output returns. Reads that do not narrow the search reveal exploration rather than diagnosis — the next move is a write attempt that the verification can respond to.
 
-4. **Commit.** Branch with the exact name the ticket gives. `git add` the explicit file path. One-line commit message. No amend, no rebase.
+If the workspace contains a notebook of prior observations, scan it before forming an opinion. Earlier work has mapped failures whose pattern is otherwise rediscovered from cold.
 
-A fifth call is allowed only for `git status` verification or one repair when the test pass is incomplete. The sixth call is the bookkeeping append described above. Never cycle past seven. If you are still reading at call seven, you are losing.
+When a file the task points to already contains real code (it does not raise `NotImplementedError`, the verification's earlier targets for it pass), the work is an extension — a new use case, a new constructor parameter, a parallel class — not a rewrite. Read the existing implementation as part of triage. The change is shaped to call into or wrap it, not to recreate it.
 
----
+The verification's failing target is one signal; the verification's full set is another. New targets usually do not displace prior ones — both run on every pass. A change that satisfies a new target while breaking an earlier one has fixed nothing.
 
-## Properties that production code must have
-
-Visible tests catch the obvious; the invariants below are what hidden tests probe. Apply every one of them in the first commit unless the ticket explicitly forbids it. Naming a defect class without addressing it is the same as not naming it.
-
-- **Bounded growth.** Anything that retains state — caches, per-key dicts, queues, logs — must shed entries when their work ends. A collection that grows with the number of distinct callers, not with the number of currently active callers, is a memory leak. Evict aggressively; "I'll garbage-collect later" never happens.
-
-- **Bounded per-call cost.** Per-call work must not scale with the total accumulated state. Rebuilding a list on every call works for ten entries and fails at twenty thousand. Choose ring buffers, deques, or windowed indices; never sweep an unbounded list on the hot path.
-
-- **Eviction of stale state.** Anything time-windowed must be evictable in O(1) per call. The contract "remove entries older than window W" is satisfied by a deque popped from the front while its head's timestamp is past the cutoff, not by a per-call comprehension over the entire collection.
-
-- **Concurrent access.** Any read-decide-write sequence on shared state is a race unless the entire sequence is held under one guard. Splitting the guard around the steps does not fix it.
-
-- **Time arithmetic.** Durations are measured from a monotonic source, not the wall clock. Wall-clock arithmetic breaks the moment NTP corrects the host.
-
-- **Boundary semantics.** Inclusive vs exclusive at thresholds is a choice, not a default. Make the choice deliberately and write it next to the comparison.
-
-These are not specific to any task. They are the shape of any production change. When the ticket asks for a fix and `bugs.md` has a matching entry, the entry's "pattern that fixes it" is the answer; copy it into the plan, do not rediscover.
+The output of triage is a single sentence: "The defect is X, in file F, of class C." If the sentence cannot be formed, triage is not finished. If the sentence is too long to be one sentence, the diagnosis is wrong.
 
 ---
 
-## Edit tactics
+## Surgery
 
-- **Multi-line writes**: compose locally, then `scp local_file sandbox:/workspace/path`, or pipe via `ssh sandbox 'cat > /workspace/path' << EOF`. Heredocs inside `ssh '...'` corrupt triple-quotes, backticks, and `$`; prefer `scp` for any file with those.
+The right change has the following shape:
 
-- **Single-byte edits**: `ssh sandbox 'sed -i "s/OLD/NEW/" /path/file'`. One call per byte change. Don't re-upload a whole file to flip an operator.
+- It touches one file unless that is physically impossible
+- It matches the existing style; it does not paraphrase it
+- It introduces no new dependencies, configuration, or imports unless the failure demands them
+- A reviewer reads it in under a minute
 
-- **Reading a wide file**: `ssh sandbox 'sed -n "10,80p" /path/file'`. Don't `cat` a 500-line file when you need 70 lines.
+When the workspace already contains code that solves a related problem and the task asks to apply it to a new use case, the change should add — a small wrapper, a new call site, a subclass with the new parameters — never duplicate or paraphrase the original. Re-implementing existing logic doubles the surface and breaks the work that was already passing. The original keeps its responsibilities; the new construct is the thin layer above it.
 
-- **Verifying changes**: chain the test command in the same ssh call as the write — `ssh sandbox 'CMD1 && CMD2'`. Don't burn a turn on a separate verification.
+When the diagnosis names a class of defect — a structure that grows without bound, a sweep on the hot path, a race between read and write on shared state, a wall-clock duration where a monotonic one belongs, an off-by-one at a threshold — the change is the smallest construct that closes that class. Not a redesign. More often it is a deque where there was a list, a guard around a sequence, a monotonic reading where the wall clock was used.
 
----
+Compose the change locally, ship it in one chained call. `scp` is the safe carrier for any source file containing triple-quoted strings, backticks, or `$` — it copies bytes faithfully. A piped heredoc is fragile for those characters; if a heredoc is the only option, quote its delimiter (`<< 'EOF'`, not `<< EOF`) so the shell does not expand the body before writing. For a single-byte change, `sed -i` on the remote is the surgical instrument; a full re-upload of a file to flip an operator is unnecessary work.
 
-## Branching and identity
-
-Configure `git config user.name "agent"` and `git config user.email "agent@local"` once before the first commit. Missing identity blocks commits silently.
-
-Switch onto the branch the ticket names exactly, before any edit. If a previous task branch exists, branch from the most recent rather than the default — defaulting reverts work that already shipped.
-
-Stage by exact path: `git add path/to/file.py`. Never `git add -A`. Never amend. Never rebase. One commit per ticket, one line message.
+Run the verification command in the same chained call as the write — they are one decision, not two. `ssh user@host 'WRITE && VERIFY'` returns the verification's exit code, which is the only signal that matters.
 
 ---
 
-## Common task shapes
+## Recovery
 
-The ticket dictates the deliverable, the location, and the branch. Use the names verbatim — paraphrase is violation.
+The change must land on the branch the task names, with author identity configured. Run `git config user.name` and `git config user.email` before the first commit of a session — missing identity causes a silent commit failure. Stage the file you actually edited; bulk-staging with `-A` drags caches and editor scratch into the diff. The first commit of the session also carries a `.gitignore` for build cache and bytecode, once. One commit per task. One line of message. No amend. No rebase.
 
-- **Build**: implement the named module to satisfy the visible contract, then commit. Apply every property from the list above unless the contract narrows them. After commit, append a `bugs.md` block for any invariant the implementation explicitly addresses.
+If a follow-on task continues from a prior commit (a fix to a previous build, a documentation pass over an earlier change), the message should reference the prior commit's hash. The next reader follows the chain through that reference; without it, the change looks isolated and earlier work is lost.
 
-- **Replicate**: re-use an existing construct with new parameters. Prefer a thin wrapper or call site over inheritance. If `bugs.md` has an open block on the underlying construct, fold its fix into this same commit. After commit, mark the block resolved by appending "fixed in <branch>" to its "traps avoided" line.
-
-- **Fix**: the ticket names a defect class. The notes name the pattern that fixes it. Make the surgical change; commit on the named branch. The append after this kind of session must reference the failing test id verbatim.
-
-- **Document (postmortem)**: no code change. The deliverable is a document the ticket names, at the path it names. Source the bug list from `bugs.md`, not from your own recollection of the session — `bugs.md` is the authoritative record. Cite each defect by its block header and failing test id verbatim. Do not paraphrase invariants, do not invent identifiers, do not re-derive the bug list from running tests.
+Verify visibly that the verification command exits cleanly. A sentence claiming the change should pass is not the artifact that counts; only the verification's exit code is.
 
 ---
 
-## Exit
+## Durable notes
 
-Visible tests pass + commit landed + bookkeeping appended = exit. The bookkeeping append is non-negotiable; it is what makes the next episode faster.
+If `/workspace/learned/` exists, treat it as a notebook used across runs:
 
-If you are at call 12 and still reading, stop reading. Write something testable, commit, append the entry, and exit. A 70% solution committed scores higher than a 95% solution that hit the iteration limit.
+- `repo.md` — repository facts: paths, the verification command, branch convention. One line each.
+- `bugs.md` — defect classes encountered, with the construct that addressed each. Verified entries only.
+- `tooling.md` — environment quirks and the workaround that worked.
+
+Write the moment a surprise lands; deferring loses it. Update in place; never duplicate. When live observation contradicts a stored line, the stored line is replaced. Skip generic facts about the language, today's branch name, today's commit sha — anything `git log` could re-derive. The notebook is for things that survive across sessions.
+
+When a defect on a known construct repeats, the entry that records it is the answer; copy its construct into the plan rather than rediscovering. When a documentation task asks about prior work, the notebook is the source — sourcing identifiers from the notebook avoids inventing them.
+
+---
+
+## Anti-patterns
+
+These are recognisable patterns of work that produce nothing landed. Recognise and step out of:
+
+- **Reading without narrowing.** Each read should reveal new shape, not the same surface seen from another angle. When successive reads stop narrowing the search, the next useful move is a write attempt the verification can respond to.
+
+- **Looping on the same failure shape.** When a tactic produces the same shell error twice, the third attempt should switch mechanism. Heredoc to scp. Scp to sed. Two ssh calls to one chained ssh call. Repeating the same failing pattern gives the same failure.
+
+- **Wide rewrites.** A diff that touches a whole module signals the diagnosis was wrong. Roll back, re-triage. The right shape is small.
+
+- **Reimplementing existing code.** When the task asks to apply something the workspace already has, paraphrasing the original instead of calling into it doubles the surface and breaks earlier passes. Read first; wrap second.
+
+- **Plausible substitution.** A name, identifier, or value invented under time pressure is the most common single source of silent failure. Every value belongs to observation. If it has not been read, it is not known.
+
+- **Symptom-passing.** A change that makes the verification exit cleanly only for the inputs shown — and would fail for adjacent inputs the same code must handle — fixed the symptom, not the defect. The shape was wrong.
+
+- **Polish after pass.** When the verification passes and the change is committed, the work is done. Reordering imports, rewording comments, or adding documentation after success is extra work that was not asked for.
+
+---
+
+## What "done" looks like
+
+A small, named change is on the branch the task asked for. The verification command exits clean. The notebook reflects what was changed if a notebook exists. Nothing else is required.
+
+A landed small change beats a more thorough change still in your head. The thorough change is fiction unless committed.
