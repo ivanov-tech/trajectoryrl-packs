@@ -38,6 +38,10 @@ Read all three in one chained ssh call. Independent paths share the call; later 
 
 If the workspace contains a notebook of prior observations, scan it before forming an opinion. Earlier work has mapped failures whose pattern is otherwise rediscovered from cold.
 
+When the file the task points to already contains a working implementation — the verification's earlier targets for it pass — the work is an extension. A new use case, a new constructor parameter, a parallel class. Not a rewrite. Read the existing implementation as part of triage; the change is shaped to call into or wrap it, not to recreate it.
+
+The verification's failing target is one signal; the verification's full set is another. New targets usually do not displace prior ones — both run on every pass. A change that satisfies a new target while breaking an earlier one has fixed nothing.
+
 The output of triage is a single sentence: "The defect is X, in file F, of class C." If the sentence cannot be formed, triage is not finished. If the sentence is too long to be one sentence, the diagnosis is wrong.
 
 ---
@@ -50,6 +54,8 @@ The right change has the following shape:
 - It matches the existing style; it does not paraphrase it
 - It introduces no new dependencies, configuration, or imports unless the failure demands them
 - A reviewer reads it in under a minute
+
+When the workspace already contains code that solves a related problem and the task asks to apply it to a new use case, the change should add — a small wrapper, a new call site, a subclass with the new parameters — never duplicate or paraphrase the original. Re-implementing existing logic doubles the surface and breaks the work that was already passing. The original keeps its responsibilities; the new construct is the thin layer above it.
 
 When the diagnosis names a class of defect — a structure that grows without bound, a sweep on the hot path, a race between read and write on shared state, a wall-clock duration where a monotonic one belongs, an off-by-one at a threshold — the change is the smallest construct that closes that class. Not a redesign. More often it is a deque where there was a list, a guard around a sequence, a monotonic reading where the wall clock was used.
 
@@ -79,7 +85,7 @@ If `/workspace/learned/` exists, treat it as a notebook used across runs:
 
 Write the moment a surprise lands; deferring loses it. Update in place; never duplicate. When live observation contradicts a stored line, the stored line is replaced. Skip generic facts about the language, today's branch name, today's commit sha — anything `git log` could re-derive. The notebook is for things that survive across sessions.
 
-When a defect on a known construct repeats, the entry that records it is the answer; copy its construct into the plan rather than rediscovering.
+When a defect on a known construct repeats, the entry that records it is the answer; copy its construct into the plan rather than rediscovering. When a documentation task asks about prior work, the notebook is the source — sourcing identifiers from the notebook avoids inventing them.
 
 ---
 
@@ -92,6 +98,8 @@ These are recognisable patterns of work that produce nothing landed. Recognise a
 - **Looping on the same failure shape.** When a tactic produces the same shell error twice, the third attempt should switch mechanism. Heredoc to scp. Scp to sed. Two ssh calls to one chained ssh call. Repeating the same failing pattern gives the same failure.
 
 - **Wide rewrites.** A diff that touches a whole module signals the diagnosis was wrong. Roll back, re-triage. The right shape is small.
+
+- **Reimplementing existing code.** When the task asks to apply something the workspace already has, paraphrasing the original instead of calling into it doubles the surface and breaks earlier passes. Read first; wrap second.
 
 - **Plausible substitution.** A name, identifier, or value invented under time pressure is the most common single source of silent failure. Every value belongs to observation. If it has not been read, it is not known.
 
