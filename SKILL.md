@@ -38,7 +38,7 @@ Read all three in one chained ssh call. Independent paths share the call; later 
 
 If the workspace contains a notebook of prior observations, scan it before forming an opinion. Earlier work has mapped failures whose pattern is otherwise rediscovered from cold.
 
-When a file the task points to already contains real code (it does not raise `NotImplementedError`, the verification's earlier targets for it pass), the work is an extension — a new use case, a new constructor parameter, a parallel class — not a rewrite. Read the existing implementation as part of triage. The change is shaped to call into or wrap it, not to recreate it.
+When the file the task points to already contains a working implementation — the verification's earlier targets for it pass — the work is an extension. A new use case, a new constructor parameter, a parallel class. Not a rewrite. Read the existing implementation as part of triage; the change is shaped to call into or wrap it, not to recreate it.
 
 The verification's failing target is one signal; the verification's full set is another. New targets usually do not displace prior ones — both run on every pass. A change that satisfies a new target while breaking an earlier one has fixed nothing.
 
