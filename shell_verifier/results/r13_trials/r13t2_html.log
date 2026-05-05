@@ -1,0 +1,57 @@
+=== break-filter-js-from-html -> /app/out.html ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=c8fc6f74648c2a053441734e195a57d0a46b4e8bfe44199d3961ff6ff7e9e0ca (NOT auto-cleaned, run 'docker rm -f c8fc6f74648c2a053441734e195a57d0a46b4e8bfe44199d3961ff6ff7e9e0ca' when done)
+
+=== Running hermes chat ===
+- This vector bypasses the filter because:
+  1. It's not a `<script>` tag
+  2. It's not a frame/embedding tag
+  3. The `content` and `http-equiv` attributes don't start with `on`
+- The browser executes the `javascript:alert('XSS')` when loading the page
+
+session_id: 20260505_020034_d942af
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output /app/out.html ===
+-rw-r--r-- 1 agent agent 1080 May  5 02:01 /app/out.html
+---
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="refresh" content="0;url=javascript:alert('XSS')">
+<style>@keyframes a{}@-webkit-keyframes a{}@keyframes b{}@-webkit-keyframes b{}@keyframes c{}@-webkit-keyframes c{}@keyframes d{}@-webkit-keyframes d{}@keyframes e{}@-webkit-keyframes e{}@keyframes f{}@-webkit-keyframes f{}@keyframes g{}@-webkit-keyframes g{}@keyframes h{}@-webkit-keyframes h{}@keyframes i{}@-webkit-keyframes i{}@keyframes j{}@-webkit-keyframes j{}@keyframes k{}@-webkit-keyframes k{}@keyframes l{}@-webkit-keyframes l{}@keyframes m{}@-webkit-keyframes m{}@keyframes n{}@-webkit-keyframes n{}@keyframes o{}@-webkit-keyframes o{}@keyframes p{}@-webkit-keyframes p{}@keyframes q{}@-webkit-keyframes q{}@keyframes r{}@-webkit-keyframes r{}@keyframes s{}@-webkit-keyframes s{}@keyframes t{}@-webkit-keyframes t{}@keyframes u{}@-webkit-keyframes u{}@keyframes v{}@-webkit-keyframes v{}@keyframes w{}@-webkit-keyframes w{}@keyframes x{}@-webkit-keyframes x{}@keyframes y{}@-webkit-keyframes y{}@keyframes z{}@-webkit-keyframes z{}</style>
+</head>
+<body>
+</body>
+</html>
+=== Tool calls used ===
+tool_calls: 16 messages: 30 in/out: 112652 / 2419
+
+=== Verifier ===
+                alert_detected = True
+    
+            except TimeoutException:
+                # No alert appeared within timeout
+                alert_detected = False
+    
+        finally:
+            if driver:
+                driver.quit()
+            # Clean up temp file
+            filtered_path.unlink(missing_ok=True)
+    
+        # Assert that an alert was detected even after filtering
+>       assert alert_detected, (
+            "No alert detected after filtering. The XSS bypass failed. "
+            "The filter successfully removed the JavaScript. "
+            "The HTML needs to be crafted to bypass the filter."
+        )
+E       AssertionError: No alert detected after filtering. The XSS bypass failed. The filter successfully removed the JavaScript. The HTML needs to be crafted to bypass the filter.
+E       assert False
+
+/tests/test_outputs.py:91: AssertionError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_out_html_bypasses_filter - AssertionErr...
+============================== 1 failed in 9.71s ===============================
+
+--- ctrf summary ---

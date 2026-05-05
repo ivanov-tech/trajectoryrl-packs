@@ -1,0 +1,50 @@
+=== break-filter-js-from-html -> /app/out.html ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=d6f92bdc642c270fccd64f25eb5d49d2519219a82d2a1c109f5abdbf4cc94a42 (NOT auto-cleaned, run 'docker rm -f d6f92bdc642c270fccd64f25eb5d49d2519219a82d2a1c109f5abdbf4cc94a42' when done)
+
+=== Running hermes chat ===
+Let me try `<svg><set attributeName="..." href="javascript:alert(1)"/></svg>` or `<svg><animate>` with JavaScript.
+
+Actually, SVG's `<animate>` with `href` and javascript: protocol might work. Or `<math>` with `href` attribute set to javascript:.
+
+Let me create the file:
+
+session_id: 20260505_010649_195112
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output /app/out.html ===
+-rw-r--r-- 1 agent agent 64 May  5 01:07 /app/out.html
+---
+<svg><set attributeName="href" to="javascript:alert(1)"/></svg>
+
+=== Tool calls used ===
+tool_calls: 5 messages: 11 in/out: 39382 / 589
+
+=== Verifier ===
+                alert_detected = True
+    
+            except TimeoutException:
+                # No alert appeared within timeout
+                alert_detected = False
+    
+        finally:
+            if driver:
+                driver.quit()
+            # Clean up temp file
+            filtered_path.unlink(missing_ok=True)
+    
+        # Assert that an alert was detected even after filtering
+>       assert alert_detected, (
+            "No alert detected after filtering. The XSS bypass failed. "
+            "The filter successfully removed the JavaScript. "
+            "The HTML needs to be crafted to bypass the filter."
+        )
+E       AssertionError: No alert detected after filtering. The XSS bypass failed. The filter successfully removed the JavaScript. The HTML needs to be crafted to bypass the filter.
+E       assert False
+
+/tests/test_outputs.py:91: AssertionError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_out_html_bypasses_filter - AssertionErr...
+============================== 1 failed in 10.21s ==============================
+
+--- ctrf summary ---

@@ -1,0 +1,50 @@
+=== break-filter-js-from-html -> /app/out.html ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=104c98e6d31d92ba047501d08c5a9b1abd974dfd1cdb60ed8330947a1ecb7aef (NOT auto-cleaned, run 'docker rm -f 104c98e6d31d92ba047501d08c5a9b1abd974dfd1cdb60ed8330947a1ecb7aef' when done)
+
+=== Running hermes chat ===
+- `<svg>` with animate/set elements using javascript: URLs
+
+The meta refresh tag triggers automatically on page load (content="0" means 0 second delay), which should cause the alert to appear without user interaction.
+
+The file has been created at /app/out.html. The test at /app/test_outputs.py will verify this works by running the filter on the file and then checking if Selenium can detect the alert being triggered.
+
+session_id: 20260505_012744_dc51f6
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output /app/out.html ===
+-rw-r--r-- 1 agent agent 97 May  5 01:28 /app/out.html
+---
+<html><head><meta http-equiv="refresh" content="0;url=javascript:alert(1)"></head></body></html>
+
+=== Tool calls used ===
+tool_calls: 17 messages: 35 in/out: 130294 / 2251
+
+=== Verifier ===
+                alert_detected = True
+    
+            except TimeoutException:
+                # No alert appeared within timeout
+                alert_detected = False
+    
+        finally:
+            if driver:
+                driver.quit()
+            # Clean up temp file
+            filtered_path.unlink(missing_ok=True)
+    
+        # Assert that an alert was detected even after filtering
+>       assert alert_detected, (
+            "No alert detected after filtering. The XSS bypass failed. "
+            "The filter successfully removed the JavaScript. "
+            "The HTML needs to be crafted to bypass the filter."
+        )
+E       AssertionError: No alert detected after filtering. The XSS bypass failed. The filter successfully removed the JavaScript. The HTML needs to be crafted to bypass the filter.
+E       assert False
+
+/tests/test_outputs.py:91: AssertionError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_out_html_bypasses_filter - AssertionErr...
+============================== 1 failed in 9.85s ===============================
+
+--- ctrf summary ---

@@ -1,0 +1,54 @@
+=== log-summary-date-ranges ->  ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=cc8f8cec6a7b29c311eddf44ebc25a7a5434e150f8de8dd70fe49d22e1918f7c (NOT auto-cleaned, run 'docker rm -f cc8f8cec6a7b29c311eddf44ebc25a7a5434e150f8de8dd70fe49d22e1918f7c' when done)
+
+=== Running hermes chat ===
+   - **total** (all dates): 16774 ERROR, 16158 WARNING, 56621 INFO
+
+3. Written the results to `/app/summary.csv` with the required format:
+   - Header: `period,severity,count`
+   - 15 data rows (5 periods × 3 severities)
+
+session_id: 20260505_022128_aa5933
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output  ===
+total 28
+drwxrwx--- 1 agent agent  4096 May  5 02:21 .
+drwxr-xr-x 1 root  root   4096 May  5 02:21 ..
+drwxr-xr-x 2 agent agent 12288 May  4 21:07 logs
+-rw-r--r-- 1 agent agent  3328 May  5 02:22 process_logs.py
+-rw-r--r-- 1 agent agent   367 May  5 02:22 summary.csv
+---
+
+=== Tool calls used ===
+tool_calls: 8 messages: 17 in/out: 55132 / 2915
+
+=== Verifier ===
+        header = reader[0]
+        assert header == ["period", "severity", "count"], f"Unexpected header: {header}"
+    
+        # Row count check
+        assert len(reader) - 1 == len(EXPECTED_ROWS), (
+            f"Expected {len(EXPECTED_ROWS)} rows, got {len(reader) - 1}"
+        )
+    
+        # Content check
+        for expected_row, actual_row in zip(EXPECTED_ROWS, reader[1:]):
+>           assert actual_row == expected_row, (
+                f"Expected row {expected_row}, got {actual_row}"
+            )
+E           AssertionError: Expected row ['today', 'ERROR', '370'], got ['today', 'ERROR', '414']
+E           assert ['today', 'ERROR', '414'] == ['today', 'ERROR', '370']
+E             
+E             At index 2 diff: '414' != '370'
+E             Use -v to get more diff
+
+/tests/test_outputs.py:49: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_summary_file_exists
+FAILED ../tests/test_outputs.py::test_summary_structure_and_counts - Assertio...
+========================= 1 failed, 1 passed in 0.03s ==========================
+
+--- ctrf summary ---

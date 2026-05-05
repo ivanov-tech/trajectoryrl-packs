@@ -1,0 +1,50 @@
+=== break-filter-js-from-html -> /app/out.html ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=0dc9d038b2720e6acbd98a177f5861a5822d0ddc991bc967ecd9f6b4455546b5 (NOT auto-cleaned, run 'docker rm -f 0dc9d038b2720e6acbd98a177f5861a5822d0ddc991bc967ecd9f6b4455546b5' when done)
+
+=== Running hermes chat ===
+-<svg></svg>
++<style>@import 'javascript:alert(1)';</style>
+  ┊ 💻 preparing terminal…
+  ┊ 💻 $         python /app/filter.py /app/out.html && cat /app/out.html  0.4s
+The `<script>` inside SVG was also removed. Let me try other approaches - perhaps something that doesn't use script tags at all. I'll try using SVG with onerror or other event handlers, but the filter removes on* attributes. Let me try CSS-based approaches or other vectors:
+
+session_id: 20260505_021225_948211
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output /app/out.html ===
+-rw-r--r-- 1 agent agent 46 May  5 02:12 /app/out.html
+---
+<style>@import 'javascript:alert(1)';</style>
+
+=== Tool calls used ===
+tool_calls: 7 messages: 14 in/out: 37200 / 817
+
+=== Verifier ===
+                alert_detected = True
+    
+            except TimeoutException:
+                # No alert appeared within timeout
+                alert_detected = False
+    
+        finally:
+            if driver:
+                driver.quit()
+            # Clean up temp file
+            filtered_path.unlink(missing_ok=True)
+    
+        # Assert that an alert was detected even after filtering
+>       assert alert_detected, (
+            "No alert detected after filtering. The XSS bypass failed. "
+            "The filter successfully removed the JavaScript. "
+            "The HTML needs to be crafted to bypass the filter."
+        )
+E       AssertionError: No alert detected after filtering. The XSS bypass failed. The filter successfully removed the JavaScript. The HTML needs to be crafted to bypass the filter.
+E       assert False
+
+/tests/test_outputs.py:91: AssertionError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_out_html_bypasses_filter - AssertionErr...
+============================== 1 failed in 9.86s ===============================
+
+--- ctrf summary ---

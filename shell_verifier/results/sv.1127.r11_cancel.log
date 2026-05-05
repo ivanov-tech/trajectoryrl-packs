@@ -1,0 +1,87 @@
+=== cancel-async-tasks -> /app/run.py ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=ed66f127bd22fe1c279ae2196b9d0d1c0aaae48a919d3e62c854520f43cfdd1c (NOT auto-cleaned, run 'docker rm -f ed66f127bd22fe1c279ae2196b9d0d1c0aaae48a919d3e62c854520f43cfdd1c' when done)
+
+=== Running hermes chat ===
+print("Cancellation test results:", results)
+print("Cleanup ran:", all('cleanup' in str(r) for r in results if r))
+EOF
+  0.4s
+Let me write a simpler test that properly checks cancellation behavior:
+
+session_id: 20260505_014156_fd191e
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output /app/run.py ===
+-rw-r--r-- 1 agent agent 1191 May  5 01:42 /app/run.py
+---
+import asyncio
+from collections.abc import Awaitable, Callable
+
+
+async def run_tasks(
+    tasks: list[Callable[[], Awaitable[None]]], max_concurrent: int
+) -> None:
+    """Run async tasks with a maximum concurrency limit.
+
+    Args:
+        tasks: List of async callables to execute.
+        max_concurrent: Maximum number of tasks that can run concurrently.
+
+    The function ensures cleanup code in tasks runs even on keyboard interrupt.
+    """
+    semaphore = asyncio.Semaphore(max_concurrent)
+    task_handles: list[asyncio.Task] = []
+
+    async def run_task(task: Callable[[], Awaitable[None]]) -> None:
+        async with semaphore:
+            await task()
+
+    async def run_all():
+        for task in tasks:
+            h = asyncio.create_task(run_task(task))
+            task_handles.append(h)
+        await asyncio.gather(*task_handles)
+
+    try:
+        await run_all()
+    except asyncio.CancelledError:
+        # Cancel all pending task handles
+        for h in task_handles:
+            if not h.done():
+                h.cancel()
+        # Wait for all tasks to complete so cleanup code runs
+        await asyncio.gather(*task_handles, return_exceptions=True)
+        raise
+
+=== Tool calls used ===
+tool_calls: 15 messages: 29 in/out: 112444 / 3931
+
+=== Verifier ===
+        proc.send_signal(signal.SIGINT)
+    
+        try:
+            stdout, stderr = proc.communicate(timeout=5)
+        finally:
+            proc.kill()
+    
+        stdout = stdout.decode("utf-8")
+    
+        assert stdout.count("Task started.") == 2
+>       assert stdout.count("Cleaned up.") == 2
+E       AssertionError: assert 0 == 2
+E        +  where 0 = <built-in method count of str object at 0x7ffffe694df0>('Cleaned up.')
+E        +    where <built-in method count of str object at 0x7ffffe694df0> = 'Task started.\nTask started.\n'.count
+
+/tests/test_outputs.py:172: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_run_py_file_exists
+PASSED ../tests/test_outputs.py::test_tasks_run_concurrently
+PASSED ../tests/test_outputs.py::test_tasks_obey_max_concurrent
+PASSED ../tests/test_outputs.py::test_tasks_cancel_below_max_concurrent
+PASSED ../tests/test_outputs.py::test_tasks_cancel_at_max_concurrent
+FAILED ../tests/test_outputs.py::test_tasks_cancel_above_max_concurrent - Ass...
+========================= 1 failed, 5 passed in 13.01s =========================
+
+--- ctrf summary ---

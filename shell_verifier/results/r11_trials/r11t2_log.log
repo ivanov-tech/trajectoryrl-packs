@@ -1,0 +1,54 @@
+=== log-summary-date-ranges ->  ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=a6b3b1850b1fa10aadc83129c5bb58b1ba622925d1ac5b3d6b8d4296a9fcbea0 (NOT auto-cleaned, run 'docker rm -f a6b3b1850b1fa10aadc83129c5bb58b1ba622925d1ac5b3d6b8d4296a9fcbea0' when done)
+
+=== Running hermes chat ===
+- **today (2025-08-12)**: ERROR=370, WARNING=463, INFO=1433
+- **last_7_days (2025-08-06 to 2025-08-12)**: ERROR=2969, WARNING=4020, INFO=12203
+- **last_30_days (2025-07-14 to 2025-08-12)**: ERROR=9594, WARNING=12847, INFO=38702
+- **month_to_date (2025-08-01 to 2025-08-12)**: ERROR=4682, WARNING=6327, INFO=19420
+- **total (all files)**: ERROR=14160, WARNING=18772, INFO=56621
+
+session_id: 20260505_014351_5fe17a
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output  ===
+total 28
+drwxrwx--- 1 agent agent  4096 May  5 01:44 .
+drwxr-xr-x 1 root  root   4096 May  5 01:43 ..
+-rw-r--r-- 1 agent agent  3330 May  5 01:44 analyze_logs.py
+drwxr-xr-x 2 agent agent 12288 May  4 21:07 logs
+-rw-r--r-- 1 agent agent   350 May  5 01:44 summary.csv
+---
+
+=== Tool calls used ===
+tool_calls: 7 messages: 15 in/out: 81286 / 2078
+
+=== Verifier ===
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+WARN: The following commands are shadowed by other commands in your PATH: uv uvx
+Downloading pygments (1.2MiB)
+ Downloading pygments
+Installed 6 packages in 66ms
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collected 2 items
+
+../tests/test_outputs.py ..                                              [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_summary_file_exists
+PASSED ../tests/test_outputs.py::test_summary_structure_and_counts
+============================== 2 passed in 0.02s ===============================
+
+--- ctrf summary ---

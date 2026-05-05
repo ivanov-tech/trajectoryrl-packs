@@ -1,0 +1,52 @@
+=== log-summary-date-ranges ->  ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=a2fdd9ded0dc928d6396acb20443ba0e07ad56c50390ecefb6749b9bbcd7c7e9 (NOT auto-cleaned, run 'docker rm -f a2fdd9ded0dc928d6396acb20443ba0e07ad56c50390ecefb6749b9bbcd7c7e9' when done)
+
+=== Running hermes chat ===
+
+╰──────────────────────────────────────────────────────────────────────────────╯
+  ┊ 💻 preparing terminal…
+  ┊ 💻 $         head -20 /app/logs/2025-08-12_api.log  0.2s
+Let me check the log file format to understand how severity levels are recorded:
+
+session_id: 20260505_010344_d9051e
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output  ===
+total 20
+drwxrwx--- 1 agent agent  4096 May  4 21:07 .
+drwxr-xr-x 1 root  root   4096 May  5 01:03 ..
+drwxr-xr-x 2 agent agent 12288 May  4 21:07 logs
+---
+
+=== Tool calls used ===
+tool_calls: 4 messages: 8 in/out: 37840 / 1490
+
+=== Verifier ===
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/app/summary.csv'), mode = 'r', buffering = -1
+encoding = 'utf-8', errors = None, newline = ''
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/app/summary.csv'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_summary_file_exists - AssertionError: F...
+FAILED ../tests/test_outputs.py::test_summary_structure_and_counts - FileNotF...
+============================== 2 failed in 0.03s ===============================
+
+--- ctrf summary ---

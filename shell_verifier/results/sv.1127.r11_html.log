@@ -1,0 +1,59 @@
+=== break-filter-js-from-html -> /app/out.html ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=53e1145859c43d0c767b64122b8875a727253a250c8e1c62d48f0990f6af957f (NOT auto-cleaned, run 'docker rm -f 53e1145859c43d0c767b64122b8875a727253a250c8e1c62d48f0990f6af957f' when done)
+
+=== Running hermes chat ===
+- Data URIs in attributes like `<a href="javascript:...">`
+- `<math>` element tricks
+- `<body>` with background data URLs
+
+Let me try creating a bypass using `<a>` tags with `href="javascript:..."` since the filter only removes `on*` attributes, not `javascript:` URLs in `href`:
+
+session_id: 20260505_014156_e146ed
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output /app/out.html ===
+-rw-r--r-- 1 agent agent 125 May  5 01:42 /app/out.html
+---
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+</style>
+</head>
+<body>
+<a href="javascript:alert('XSS')">click me</a>
+</body>
+</html>
+
+=== Tool calls used ===
+tool_calls: 8 messages: 15 in/out: 48443 / 878
+
+=== Verifier ===
+                alert_detected = True
+    
+            except TimeoutException:
+                # No alert appeared within timeout
+                alert_detected = False
+    
+        finally:
+            if driver:
+                driver.quit()
+            # Clean up temp file
+            filtered_path.unlink(missing_ok=True)
+    
+        # Assert that an alert was detected even after filtering
+>       assert alert_detected, (
+            "No alert detected after filtering. The XSS bypass failed. "
+            "The filter successfully removed the JavaScript. "
+            "The HTML needs to be crafted to bypass the filter."
+        )
+E       AssertionError: No alert detected after filtering. The XSS bypass failed. The filter successfully removed the JavaScript. The HTML needs to be crafted to bypass the filter.
+E       assert False
+
+/tests/test_outputs.py:91: AssertionError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_out_html_bypasses_filter - AssertionErr...
+============================== 1 failed in 9.73s ===============================
+
+--- ctrf summary ---

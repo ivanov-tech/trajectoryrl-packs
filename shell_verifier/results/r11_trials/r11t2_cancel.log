@@ -1,0 +1,99 @@
+=== cancel-async-tasks -> /app/run.py ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=dd00cf5243311e664f5542bb019115ca94214fe650333c41876ba11e8d241050 (NOT auto-cleaned, run 'docker rm -f dd00cf5243311e664f5542bb019115ca94214fe650333c41876ba11e8d241050' when done)
+
+=== Running hermes chat ===
+
+All tests passed:
+- Basic execution of tasks
+- Concurrency limit enforcement (max 2 concurrent)
+- Cleanup runs on cancellation
+
+session_id: 20260505_014351_fbf0e6
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output /app/run.py ===
+-rw-r--r-- 1 agent agent 2035 May  5 01:44 /app/run.py
+---
+import asyncio
+from collections.abc import Awaitable, Callable
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def limiter(max_concurrent: int):
+    """A context manager that limits concurrent operations."""
+    semaphore = asyncio.Semaphore(max_concurrent)
+    try:
+        async with semaphore:
+            yield
+    finally:
+        pass
+
+
+async def run_tasks(
+    tasks: list[Callable[[], Awaitable[None]]], max_concurrent: int
+) -> None:
+    """
+    Run async tasks with a maximum number of concurrent executions.
+    
+    Each task is a callable that returns an Awaitable. Tasks are run
+    concurrently up to max_concurrent at a time. On KeyboardInterrupt,
+    pending tasks are cancelled and cleanup code runs.
+    
+    Args:
+        tasks: List of async task callables (each takes no args, returns Awaitable)
+        max_concurrent: Maximum number of tasks to run concurrently
+    """
+    pending: list[asyncio.Task] = []
+    
+    try:
+        for task in tasks:
+            if len(pending) >= max_concurrent:
+                # Wait for at least one task to complete
+                done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
+                # Clear done tasks from the list
+                pending = list(pending)
+            
+            # Start a new task
+            pending.append(asyncio.create_task(task()))
+        
+        # Wait for all remaining tasks
+        if pending:
+            await asyncio.gather(*pending, return_exceptions=True)
+            
+    except asyncio.CancelledError:
+        # Handle cancellation gracefully
+        for task in pending:
+
+=== Tool calls used ===
+tool_calls: 9 messages: 18 in/out: 52427 / 2456
+
+=== Verifier ===
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+WARN: The following commands are shadowed by other commands in your PATH: uv uvx
+Downloading pygments (1.2MiB)
+ Downloading pygments
+Installed 6 packages in 71ms
+============================= test session starts ==============================
+platform linux -- Python 3.13.5, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collected 6 items
+
+../tests/test_outputs.py ......                                          [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_run_py_file_exists
+PASSED ../tests/test_outputs.py::test_tasks_run_concurrently
+PASSED ../tests/test_outputs.py::test_tasks_obey_max_concurrent
+PASSED ../tests/test_outputs.py::test_tasks_cancel_below_max_concurrent
+PASSED ../tests/test_outputs.py::test_tasks_cancel_at_max_concurrent
+PASSED ../tests/test_outputs.py::test_tasks_cancel_above_max_concurrent
+============================== 6 passed in 13.94s ==============================
+
+--- ctrf summary ---

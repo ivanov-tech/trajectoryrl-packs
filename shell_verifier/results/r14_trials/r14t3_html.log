@@ -1,0 +1,55 @@
+=== break-filter-js-from-html -> /app/out.html ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=24666ce506ddb323146811f844908915cfa07b5ae617d1b81b62be1442ae56d5 (NOT auto-cleaned, run 'docker rm -f 24666ce506ddb323146811f844908915cfa07b5ae617d1b81b62be1442ae56d5' when done)
+
+=== Running hermes chat ===
+<parameter=path>
+/app/out.html
+</parameter>
+</function>
+</tool_call>
+
+session_id: 20260505_021229_7e3b66
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output /app/out.html ===
+-rw-r--r-- 1 agent agent 125 May  5 02:13 /app/out.html
+---
+<!DOCTYPE html>
+<html>
+<body>
+<math><mtext><table><mglyph><style><img src=x onerror=alert(1)></style></math>
+</body>
+</html>
+
+=== Tool calls used ===
+tool_calls: 17 messages: 35 in/out: 115586 / 1948
+
+=== Verifier ===
+                alert_detected = True
+    
+            except TimeoutException:
+                # No alert appeared within timeout
+                alert_detected = False
+    
+        finally:
+            if driver:
+                driver.quit()
+            # Clean up temp file
+            filtered_path.unlink(missing_ok=True)
+    
+        # Assert that an alert was detected even after filtering
+>       assert alert_detected, (
+            "No alert detected after filtering. The XSS bypass failed. "
+            "The filter successfully removed the JavaScript. "
+            "The HTML needs to be crafted to bypass the filter."
+        )
+E       AssertionError: No alert detected after filtering. The XSS bypass failed. The filter successfully removed the JavaScript. The HTML needs to be crafted to bypass the filter.
+E       assert False
+
+/tests/test_outputs.py:91: AssertionError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_out_html_bypasses_filter - AssertionErr...
+============================== 1 failed in 9.92s ===============================
+
+--- ctrf summary ---

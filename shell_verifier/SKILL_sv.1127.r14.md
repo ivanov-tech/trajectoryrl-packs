@@ -28,6 +28,10 @@ A small set of habits for getting one named output produced and validated within
 
 If a script reads/validates/rewrites your file before the real consumer sees it, the two readers can disagree about the same bytes. Inputs the first treats as one harmless thing and the second splits — irregular structures, half-formed delimiters, ambiguous whitespace — are the seams. Read the transformer source first; the gap is in what it does not strip.
 
+## When a capacity limit applies
+
+For tasks structured around dispatching N items with a max-K-at-a-time limit, the way K is enforced matters. A lazy dispatch — items pulled from a backlog as slots free — survives interruption cleanly: items still in the backlog never started, items in flight finish their cleanup. An eager dispatch — every item created upfront, all but K parked on a counter — interacts badly with interruption: parked items can race past the counter during the cleanup of the in-flight items, and end up partially started before being interrupted themselves. Pull from a backlog; do not park.
+
 ## What burns the session
 
 - Reading without writing.

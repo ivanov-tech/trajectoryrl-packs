@@ -1,0 +1,54 @@
+=== log-summary-date-ranges ->  ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=5421b44738dfa98fbc47f5ba6b2a2f6f060be66d9c194fd9fef67d6a673dabbe (NOT auto-cleaned, run 'docker rm -f 5421b44738dfa98fbc47f5ba6b2a2f6f060be66d9c194fd9fef67d6a673dabbe' when done)
+
+=== Running hermes chat ===
+
+Welcome to Hermes Agent! Type your message or /help for commands.
+
+  ⚠ tirith security scanner enabled but not available — command scanning will use pattern matching only
+Warning: Input is not a terminal (fd=0).
+
+Goodbye! ⚕
+Exported 0 sessions to /workspace/turns.jsonl
+
+=== Output  ===
+total 20
+drwxrwx--- 1 agent agent  4096 May  4 21:07 .
+drwxr-xr-x 1 root  root   4096 May  5 01:53 ..
+drwxr-xr-x 2 agent agent 12288 May  4 21:07 logs
+---
+
+=== Tool calls used ===
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import json, sys; d=json.loads(sys.stdin.readline()); print("tool_calls:", d.get("tool_call_count"), "messages:", len(d.get("messages",[])), "in/out:", d.get("input_tokens"),"/",d.get("output_tokens"))
+
+=== Verifier ===
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/tests/test_outputs.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/app/summary.csv'), mode = 'r', buffering = -1
+encoding = 'utf-8', errors = None, newline = ''
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed to by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/app/summary.csv'
+
+/usr/lib/python3.13/pathlib/_local.py:539: FileNotFoundError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_summary_file_exists - AssertionError: F...
+FAILED ../tests/test_outputs.py::test_summary_structure_and_counts - FileNotF...
+============================== 2 failed in 0.03s ===============================
+
+--- ctrf summary ---

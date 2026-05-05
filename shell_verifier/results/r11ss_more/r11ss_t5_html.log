@@ -1,0 +1,47 @@
+=== break-filter-js-from-html -> /app/out.html ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=3ba42147c1b4f9393f0bb6a1b61b9ae30e50fbef7ba249762f592b1a14944565 (NOT auto-cleaned, run 'docker rm -f 3ba42147c1b4f9393f0bb6a1b61b9ae30e50fbef7ba249762f592b1a14944565' when done)
+
+=== Running hermes chat ===
+1. Removes `<script>` tags
+2. Removes `<frame>`, `<iframe>`, `<object>`, `<embed>` tags
+3. Removes any attribute starting with "on" (like onclick, onload)
+
+Let me check what tests exist to understand what they're checking for:
+
+session_id: 20260505_022407_fe9eed
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output /app/out.html ===
+
+=== Tool calls used ===
+tool_calls: 4 messages: 9 in/out: 25229 / 822
+
+=== Verifier ===
+plugins: json-ctrf-0.3.5
+collected 1 item
+
+../tests/test_outputs.py F                                               [100%]
+
+=================================== FAILURES ===================================
+________________________ test_out_html_bypasses_filter _________________________
+
+    def test_out_html_bypasses_filter():
+        """Test that out.html still triggers an alert after being filtered."""
+        import subprocess
+    
+        out_path = Path("/app/out.html")
+    
+        # First check the file exists
+>       assert out_path.exists(), f"File {out_path} does not exist"
+E       AssertionError: File /app/out.html does not exist
+E       assert False
+E        +  where False = exists()
+E        +    where exists = PosixPath('/app/out.html').exists
+
+/tests/test_outputs.py:25: AssertionError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_out_html_bypasses_filter - AssertionErr...
+============================== 1 failed in 0.19s ===============================
+
+--- ctrf summary ---

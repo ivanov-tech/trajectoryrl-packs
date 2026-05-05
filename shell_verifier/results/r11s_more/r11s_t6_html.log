@@ -1,0 +1,60 @@
+=== break-filter-js-from-html -> /app/out.html ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=5d1ec8ca1fc16ff9ba5a710233196119b31a727be7e909f60c858362bf592134 (NOT auto-cleaned, run 'docker rm -f 5d1ec8ca1fc16ff9ba5a710233196119b31a727be7e909f60c858362bf592134' when done)
+
+=== Running hermes chat ===
+- `<script>` tags
+- `<frame>`, `<iframe>`, `<object>`, `<embed>` tags  
+- Attributes starting with "on"
+
+It doesn't remove `<style>` tags or filter CSS content, so the `javascript:` URL in the CSS triggers an alert when the page loads in a browser.
+
+session_id: 20260505_020619_017323
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output /app/out.html ===
+-rw-r--r-- 1 agent agent 119 May  5 02:06 /app/out.html
+---
+<html>
+<head>
+<style>
+body {
+  background-image: url("javascript:alert(1)");
+}
+</style>
+</head>
+<body>
+</body>
+</html>
+
+=== Tool calls used ===
+tool_calls: 10 messages: 21 in/out: 58490 / 1021
+
+=== Verifier ===
+                alert_detected = True
+    
+            except TimeoutException:
+                # No alert appeared within timeout
+                alert_detected = False
+    
+        finally:
+            if driver:
+                driver.quit()
+            # Clean up temp file
+            filtered_path.unlink(missing_ok=True)
+    
+        # Assert that an alert was detected even after filtering
+>       assert alert_detected, (
+            "No alert detected after filtering. The XSS bypass failed. "
+            "The filter successfully removed the JavaScript. "
+            "The HTML needs to be crafted to bypass the filter."
+        )
+E       AssertionError: No alert detected after filtering. The XSS bypass failed. The filter successfully removed the JavaScript. The HTML needs to be crafted to bypass the filter.
+E       assert False
+
+/tests/test_outputs.py:91: AssertionError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_out_html_bypasses_filter - AssertionErr...
+============================== 1 failed in 9.79s ===============================
+
+--- ctrf summary ---

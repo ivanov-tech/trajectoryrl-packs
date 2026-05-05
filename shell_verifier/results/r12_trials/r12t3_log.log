@@ -1,0 +1,54 @@
+=== log-summary-date-ranges ->  ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=285812dae4176f612fb0ee340ff0a0132f6e07fa2b06df1fa2ba3a31d42464f3 (NOT auto-cleaned, run 'docker rm -f 285812dae4176f612fb0ee340ff0a0132f6e07fa2b06df1fa2ba3a31d42464f3' when done)
+
+=== Running hermes chat ===
+- **today (2025-08-12)**: 4 files with 370 ERRORs, 463 WARNINGs, 1433 INFOs
+- **last_7_days (2025-08-06 to 2025-08-12)**: 2969 ERRORs, 4020 WARNINGs, 12203 INFOs
+- **last_30_days (2025-07-13 to 2025-08-12)**: 9949 ERRORs, 13294 WARNINGs, 40037 INFOs
+- **month_to_date (2025-08-01 to 2025-08-12)**: 4682 ERRORs, 6327 WARNINGs, 19420 INFOs
+- **total (all files)**: 14160 ERRORs, 18772 WARNINGs, 56621 INFOs
+
+session_id: 20260505_015350_60d1a7
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output  ===
+total 28
+drwxrwx--- 1 agent agent  4096 May  5 01:54 .
+drwxr-xr-x 1 root  root   4096 May  5 01:53 ..
+-rw-r--r-- 1 agent agent  2193 May  5 01:54 count_severities.py
+drwxr-xr-x 2 agent agent 12288 May  4 21:07 logs
+-rw-r--r-- 1 agent agent   350 May  5 01:54 summary.csv
+---
+
+=== Tool calls used ===
+tool_calls: 14 messages: 30 in/out: 129076 / 2577
+
+=== Verifier ===
+        header = reader[0]
+        assert header == ["period", "severity", "count"], f"Unexpected header: {header}"
+    
+        # Row count check
+        assert len(reader) - 1 == len(EXPECTED_ROWS), (
+            f"Expected {len(EXPECTED_ROWS)} rows, got {len(reader) - 1}"
+        )
+    
+        # Content check
+        for expected_row, actual_row in zip(EXPECTED_ROWS, reader[1:]):
+>           assert actual_row == expected_row, (
+                f"Expected row {expected_row}, got {actual_row}"
+            )
+E           AssertionError: Expected row ['last_30_days', 'ERROR', '9594'], got ['last_30_days', 'ERROR', '9949']
+E           assert ['last_30_day...RROR', '9949'] == ['last_30_day...RROR', '9594']
+E             
+E             At index 2 diff: '9949' != '9594'
+E             Use -v to get more diff
+
+/tests/test_outputs.py:49: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED ../tests/test_outputs.py::test_summary_file_exists
+FAILED ../tests/test_outputs.py::test_summary_structure_and_counts - Assertio...
+========================= 1 failed, 1 passed in 0.02s ==========================
+
+--- ctrf summary ---

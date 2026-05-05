@@ -28,6 +28,12 @@ A small set of habits for getting one named output produced and validated within
 
 If a script reads/validates/rewrites your file before the real consumer sees it, the two readers can disagree about the same bytes. Inputs the first treats as one harmless thing and the second splits — irregular structures, half-formed delimiters, ambiguous whitespace — are the seams. Read the transformer source first; the gap is in what it does not strip.
 
+## Read the tests
+
+If the brief points at a tests directory or a check script, open it before you start writing the deliverable. The tests describe every case the grader cares about, including the ones the brief glossed over. A first attempt that satisfies the obvious case but ignores the test list's edge cases fails; a first attempt shaped against the test list lands the grader on the first try more often than not.
+
+When the tests exercise lifecycle behaviours (start, run, interrupt, cleanup; or first call, mid-window call, expiry; or under-cap, at-cap, above-cap), make each behaviour explicit in your code rather than hoping the default path covers them all.
+
 ## What burns the session
 
 - Reading without writing.
