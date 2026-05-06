@@ -1,0 +1,5 @@
+# Local-only — do not push to public repo.
+# Only pack.json (the on-chain referenced file) is tracked.
+*
+!.gitignore
+!pack.json
