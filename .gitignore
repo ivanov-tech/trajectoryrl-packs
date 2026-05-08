@@ -1,8 +1,14 @@
 # Local-only — do not push to public repo.
 # Only on-chain referenced pack files are tracked.
-# - pack.json     → UID 226 (gor-hotkey-01)
-# - pack_r87.json → UID 21  (gor-hotkey-02)
+# Filenames kept short (rNNN.json) to give breathing room in the
+# 128-byte commitment limit (64 hash + 1 pipe + URL ≤ 128).
+# - pack.json     → UID 226 (gor-hotkey-01) — r42 historical (will be superseded)
+# - pack_r87.json → UID 21  (gor-hotkey-02) — r87 historical (will be superseded)
+# - r102.json     → UID 226 (gor-hotkey-01) — r102 "Output First" (new submission)
+# - r103.json     → UID 21  (gor-hotkey-02) — r103 "Authorized Audit" (new submission)
 *
 !.gitignore
 !pack.json
 !pack_r87.json
+!r102.json
+!r103.json
