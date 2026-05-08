@@ -1,5 +1,8 @@
 # Local-only — do not push to public repo.
-# Only pack.json (the on-chain referenced file) is tracked.
+# Only on-chain referenced pack files are tracked.
+# - pack.json     → UID 226 (gor-hotkey-01)
+# - pack_r87.json → UID 21  (gor-hotkey-02)
 *
 !.gitignore
 !pack.json
+!pack_r87.json
