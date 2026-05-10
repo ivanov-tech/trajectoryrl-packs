@@ -5,9 +5,10 @@
 # - pack.json     → historical r42 (UID 226 — superseded)
 # - pack_r87.json → historical r87 (UID 21  — superseded)
 # - r102.json     → historical r102 "Output First" (UID 226 — superseded by r104)
-# - r103.json     → historical r103 "Authorized Audit" (UID 21 — superseded by r106)
+# - r103.json     → historical r103 "Authorized Audit" (UID 21 — superseded by r106 then r108)
 # - r104.json     → UID 226 (gor-hotkey-01) — r104 "Read, Write, Validate"
-# - r106.json     → UID 21  (gor-hotkey-02) — r106 "Read, Write, Validate" (new)
+# - r106.json     → historical r106 (UID 21 — pre-eval FAIL on §11 cribsheet, superseded by r108)
+# - r108.json     → UID 21  (gor-hotkey-02) — r108 "Read, Write, Validate" (new, post-skill-audit)
 *
 !.gitignore
 !pack.json
@@ -16,3 +17,4 @@
 !r103.json
 !r104.json
 !r106.json
+!r108.json
