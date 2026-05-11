@@ -10,7 +10,7 @@
 # - r106.json     → historical r106 (UID 21 — pre-eval FAIL on §11 cribsheet, superseded by r108)
 # - r108.json     → historical r108 (UID 21 — chain score 1.76 ep 1242, superseded by r111)
 # - r109.json     → UID 226 (gor-hotkey-01) — r109 (= r108 content, awaiting cross-UID challenge)
-# - r111.json     → UID 21  (gor-hotkey-02) — r111 "Engineering Operating Protocol" (formal scenario-aware standards, modeled on UID 56/58 passing packs)
+# - r111.json     → UID 21  (gor-hotkey-02) — r111 "Engineering Operating Protocol" (formal scenario-aware standards, modeled on UID 56/58 passing packs; 3 supra-precedent hints softened: WAL→journals, ?mode=ro→read-only flag, git mutating list dropped)
 *
 !.gitignore
 !pack.json
