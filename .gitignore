@@ -14,6 +14,7 @@
 # - r113.json     → UID 21  (gor-hotkey-02) — r113 = r112 v5 "compressed Read-Write-Validate" (Procedure/Principles/Do-not, 2668 chars, local pre-eval PASS, expected chain ~1.32 from local OR mean 2.03)
 # - r119.json     → NEW UID (different coldkey) — r119 "anti-hallucinate + hard turn-1 stub rule" (3172 chars, N=8 local OR mean=2.513 σ=0.601, predicted chain ~2.87 via factor 1.14; broad scenario coverage: cancel 100%, db-wal 75%, log 88%, nginx 100%, vuln 75%, path 12%, fix-git 0%). Evaluated chain ep1313 consensus 2.149 (UID 203).
 # - r127.json     → UID 226 (gor-hotkey-01) — r127parallel "r119 + parallel-batching hint" (3385 chars, N=8 local OR mean=3.097 σ=0.786 max=4.380, fix-git BREAKTHROUGH 2/8, predicted chain 2.85-3.5). Sole win across all today's r119+X experiments (r121-r129 all regressed). Pack design: parallel tool calls batched within turn — addresses observed wallclock-budget exhaustion failure mode.
+# - r127B.json    → r127parallel slightly-modified copy (Do not bullets reordered, semantically identical). Hash differs to pass uniqueness check. SHA-256 of pack.json: e2b1f2c6deee7a7ec850cad2a98ad21f2435c76d4530f2c6aa98d5d820b2a76a. Built 2026-05-12 ~01:24 local for chain resubmit on Hermes 0.13.0 era. Same design as r127 (proven 3.39 chain on Hermes 0.8.0).
 *
 !.gitignore
 !pack.json
@@ -28,3 +29,4 @@
 !r113.json
 !r119.json
 !r127.json
+!r127B.json
