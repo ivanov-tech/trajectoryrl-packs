@@ -11,6 +11,7 @@
 # - r108.json     → historical r108 (UID 21 — chain score 1.76 ep 1242, superseded by r111)
 # - r109.json     → UID 226 (gor-hotkey-01) — r109 (= r108 content, awaiting cross-UID challenge)
 # - r111.json     → UID 21  (gor-hotkey-02) — r111 "Engineering Operating Protocol" (formal scenario-aware standards, modeled on UID 56/58 passing packs; 3 supra-precedent hints softened: WAL→journals, ?mode=ro→read-only flag, git mutating list dropped)
+# - r113.json     → UID 21  (gor-hotkey-02) — r113 = r112 v5 "compressed Read-Write-Validate" (Procedure/Principles/Do-not, 2668 chars, local pre-eval PASS, expected chain ~1.32 from local OR mean 2.03)
 *
 !.gitignore
 !pack.json
@@ -22,3 +23,4 @@
 !r108.json
 !r109.json
 !r111.json
+!r113.json
