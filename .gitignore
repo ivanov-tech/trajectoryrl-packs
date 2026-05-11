@@ -12,7 +12,8 @@
 # - r109.json     → UID 226 (gor-hotkey-01) — r109 (= r108 content, awaiting cross-UID challenge)
 # - r111.json     → UID 21  (gor-hotkey-02) — r111 "Engineering Operating Protocol" (formal scenario-aware standards, modeled on UID 56/58 passing packs; 3 supra-precedent hints softened: WAL→journals, ?mode=ro→read-only flag, git mutating list dropped)
 # - r113.json     → UID 21  (gor-hotkey-02) — r113 = r112 v5 "compressed Read-Write-Validate" (Procedure/Principles/Do-not, 2668 chars, local pre-eval PASS, expected chain ~1.32 from local OR mean 2.03)
-# - r119.json     → NEW UID (different coldkey) — r119 "anti-hallucinate + hard turn-1 stub rule" (3172 chars, N=8 local OR mean=2.513 σ=0.601, predicted chain ~2.87 via factor 1.14; broad scenario coverage: cancel 100%, db-wal 75%, log 88%, nginx 100%, vuln 75%, path 12%, fix-git 0%)
+# - r119.json     → NEW UID (different coldkey) — r119 "anti-hallucinate + hard turn-1 stub rule" (3172 chars, N=8 local OR mean=2.513 σ=0.601, predicted chain ~2.87 via factor 1.14; broad scenario coverage: cancel 100%, db-wal 75%, log 88%, nginx 100%, vuln 75%, path 12%, fix-git 0%). Evaluated chain ep1313 consensus 2.149 (UID 203).
+# - r127.json     → UID 226 (gor-hotkey-01) — r127parallel "r119 + parallel-batching hint" (3385 chars, N=8 local OR mean=3.097 σ=0.786 max=4.380, fix-git BREAKTHROUGH 2/8, predicted chain 2.85-3.5). Sole win across all today's r119+X experiments (r121-r129 all regressed). Pack design: parallel tool calls batched within turn — addresses observed wallclock-budget exhaustion failure mode.
 *
 !.gitignore
 !pack.json
@@ -26,3 +27,4 @@
 !r111.json
 !r113.json
 !r119.json
+!r127.json
