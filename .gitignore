@@ -18,6 +18,8 @@
 # - r127C.json    → r127parallel variant C (Principles bullets reordered). Hash: a217187448510145b63a9862b0d2be6fbca848975bf94844e94456164bc1602f. Multi-submit lottery strategy.
 # - r127D.json    → r127parallel variant D (Hard-rule sub-bullets + Failure types reordered). Hash: 04a287a50f8e34b87e2daef0d02f8b5e9fa6e93d8c5d89381bdeb00dde2402c1.
 # - r127E.json    → r127parallel variant E (stub-types reversed + Failure types reversed + Do not reversed). Hash: a36c0a2781a3a5bc3c3c537c3c8a23b35f3b9062fbc9f99df22919991c49013a.
+# Naming convention shift (2026-05-12): repo renamed to `trajrl-pck`, new packs use date-seq prefix from local naming (e.g. `20260512-16.json` for the V4safe4 pack from `local/20260512-16-failureTypedV4safe4dropinDirs.md`).
+# - 20260512-16.json → V4safe4 "meta-pack with drop-in dirs" (8742 bytes, 5 archetypes + universal techniques + drop-in config hint + cancel-async/db-wal/nginx hints — all CALIBRATION-4 audit-clean). Local N=1 = 6.389 (tied chain winner uid030 6.247). Hash: 58b4d3e2193b3745f2177f59c5296d82a97e827a1a7402e26e432f4ae3c4df7f.
 *
 !.gitignore
 !pack.json
@@ -36,3 +38,4 @@
 !r127C.json
 !r127D.json
 !r127E.json
+!20260512-16.json
