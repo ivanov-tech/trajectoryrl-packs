@@ -24,6 +24,7 @@
 # - 20260512-16C.json → V4safe4 variant C (Do not first 2 bullets swapped). Hash: 085bb87335088722cdafb9c039b66e9ff66d81014352a9191d7218d05068947b.
 # - 20260514-33.json  → V34safe "generic config-scope + drop-in framing" (2221 bytes from 2134-byte local). Audit-safe rewrite of V34 (no nginx lexicon). Local multi-8 t1 final_score=7.023 (vs V34 7.098 — 99% preserved). Hash: c570aeacbc1661d2f98383c2d24b3c33f3b20e7ba73883ac89195dae3bf67810.
 # - 20260516-34.json  → HTML sanitizer expert boundary pack from test.md exact content. Hash: ec067ef5fc339ff55649d116b94185a44179da86498b4fb25c979cebe4d0ab85.
+# - 20260516-35.json  → combo_safe_v2_20260516_1321 broad safe pack. Local parallel9 final_score=7.222; db-wal=0.714, nginx/fix-git/log-summary=1.000, HTML=0.000. Hash: fbe3fd761a12cc678e7b1c678a62f9fa22f8e7776ee17b82c44d5c8d408ad400.
 *
 !.gitignore
 !pack.json
@@ -47,3 +48,4 @@
 !20260512-16C.json
 !20260514-33.json
 !20260516-34.json
+!20260516-35.json
